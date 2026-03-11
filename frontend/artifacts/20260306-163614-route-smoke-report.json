@@ -1,0 +1,87 @@
+{
+  "baseUrl": "http://localhost:5174",
+  "stamp": "20260306-163614",
+  "results": [
+    {
+      "name": "home",
+      "url": "http://localhost:5174/",
+      "finalUrl": "http://localhost:5174/",
+      "title": "Travel Website Design",
+      "overlayText": null,
+      "h1": "나만의 그늘을 찾아 떠나 볼까요?",
+      "console": [
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        },
+        {
+          "type": "info",
+          "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold"
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        },
+        {
+          "type": "info",
+          "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold"
+        }
+      ],
+      "pageErrors": [],
+      "requestFailed": [
+        {
+          "url": "https://images.unsplash.com/photo-1582719478250-cc67cbd5025b?q=80&w=1800&auto=format&fit=crop",
+          "method": "GET",
+          "failure": "net::ERR_BLOCKED_BY_ORB"
+        }
+      ],
+      "badResponses": [],
+      "screenshotPath": "artifacts/20260306-163614-home.png",
+      "clientNav": {
+        "attempted": false,
+        "reason": "No link with href containing /space/new found on Home."
+      },
+      "linkHrefs": [
+        "#",
+        "#",
+        "#"
+      ]
+    },
+    {
+      "name": "space-new",
+      "url": "http://localhost:5174/space/new",
+      "finalUrl": "http://localhost:5174/space/new",
+      "title": "Travel Website Design",
+      "overlayText": null,
+      "h1": null,
+      "console": [
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        },
+        {
+          "type": "info",
+          "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold"
+        }
+      ],
+      "pageErrors": [],
+      "requestFailed": [],
+      "badResponses": [],
+      "screenshotPath": "artifacts/20260306-163614-space-new.png",
+      "clientNav": null,
+      "linkHrefs": null
+    }
+  ]
+}

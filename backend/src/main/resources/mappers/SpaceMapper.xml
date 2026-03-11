@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.search.mapper.SpaceMapper">
+
+    <select id="getSpaceList" resultType="com.search.dto.MainSpaceDto">
+        SELECT s.space_id as id, s.space_name, s.space_detail, si.img_url, s.price,
+               s.category, s.address, s.max_capacity as maxCapacity
+        FROM space s
+        JOIN space_img si ON s.space_id = si.space_id
+        WHERE si.repimg_yn = 'Y'
+        <if test="searchDto.searchSpaceStatus != null">
+            AND s.space_status = #{searchDto.searchSpaceStatus}
+        </if>
+        <if test="searchDto.searchCategory != null">
+            AND s.category = #{searchDto.searchCategory}
+        </if>
+        <if test="searchDto.searchMaxCapacity != null">
+            AND s.max_capacity &gt;= #{searchDto.searchMaxCapacity}
+        </if>
+        <if test="searchDto.searchAddress != null and searchDto.searchAddress != ''">
+            AND s.address LIKE CONCAT('%', #{searchDto.searchAddress}, '%')
+        </if>
+        <if test="searchDto.searchQuery != null and searchDto.searchQuery != ''">
+            AND (s.space_name LIKE CONCAT('%', #{searchDto.searchQuery}, '%')
+            OR s.space_detail LIKE CONCAT('%', #{searchDto.searchQuery}, '%'))
+        </if>
+        ORDER BY s.space_id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="getSpaceCount" resultType="long">
+        SELECT COUNT(*)
+        FROM space s
+        WHERE 1=1
+        <if test="searchDto.searchSpaceStatus != null">
+            AND s.space_status = #{searchDto.searchSpaceStatus}
+        </if>
+        <if test="searchDto.searchCategory != null">
+            AND s.category = #{searchDto.searchCategory}
+        </if>
+        <if test="searchDto.searchMaxCapacity != null">
+            AND s.max_capacity &gt;= #{searchDto.searchMaxCapacity}
+        </if>
+        <if test="searchDto.searchAddress != null and searchDto.searchAddress != ''">
+            AND s.address LIKE CONCAT('%', #{searchDto.searchAddress}, '%')
+        </if>
+        <if test="searchDto.searchQuery != null and searchDto.searchQuery != ''">
+            AND (s.space_name LIKE CONCAT('%', #{searchDto.searchQuery}, '%')
+            OR s.space_detail LIKE CONCAT('%', #{searchDto.searchQuery}, '%'))
+        </if>
+    </select>
+</mapper>
