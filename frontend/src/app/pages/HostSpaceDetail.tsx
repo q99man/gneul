@@ -60,7 +60,7 @@ export default function HostSpaceDetailPage() {
 
   if (loading) {
     return (
-      <HostSpaceShell onClose={() => navigate("/mypage/host/spaces")}>
+      <HostSpaceShell onClose={() => navigate("/mypage", { state: { menu: "host_spaces" } })}>
         <div className="flex min-h-[420px] items-center justify-center px-4 py-8">
           <p className="text-muted-foreground">불러오는 중...</p>
         </div>
@@ -69,10 +69,10 @@ export default function HostSpaceDetailPage() {
   }
   if (error || !space) {
     return (
-      <HostSpaceShell onClose={() => navigate("/mypage/host/spaces")}>
+      <HostSpaceShell onClose={() => navigate("/mypage", { state: { menu: "host_spaces" } })}>
         <div className="flex min-h-[420px] flex-col items-center justify-center gap-4 px-4 py-8">
           <p className="text-destructive">{error ?? "공간 정보를 찾을 수 없습니다."}</p>
-          <Button variant="outline" onClick={() => navigate("/mypage/host/spaces")}>
+          <Button variant="outline" onClick={() => navigate("/mypage", { state: { menu: "host_spaces" } })}>
             목록으로
           </Button>
         </div>
@@ -81,7 +81,7 @@ export default function HostSpaceDetailPage() {
   }
 
   return (
-    <HostSpaceShell onClose={() => navigate("/mypage/host/spaces")}>
+    <HostSpaceShell onClose={() => navigate("/mypage", { state: { menu: "host_spaces" } })}>
       <HostSpaceDetailContent space={space} />
     </HostSpaceShell>
   );

@@ -5,7 +5,7 @@ import type { GuestSpaceCardDest } from './GuestSpaceCard';
 
 interface GuestSpaceGridProps {
   items: GuestSpaceCardDest[];
-  onSelect: (dest: GuestSpaceCardDest, cardRect: DOMRect) => void;
+  onSelect: (dest: GuestSpaceCardDest, cardRect: DOMRect, renderId: string) => void;
   category?: string | null;
 }
 
@@ -17,17 +17,21 @@ export const GuestSpaceGrid = ({ items, onSelect, category }: GuestSpaceGridProp
   return (
     <motion.div
       layout
-      className="w-full relative transition-all duration-1000 ease-[cubic-bezier(0.76,0,0.24,1)] grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 md:gap-6 xl:gap-8 px-[15px] md:px-[50px]"
+      className="relative grid w-full grid-cols-3 gap-4 px-[15px] transition-all duration-1000 ease-[cubic-bezier(0.76,0,0.24,1)] sm:grid-cols-4 md:gap-6 md:px-[50px] lg:grid-cols-5 xl:grid-cols-6 xl:gap-8 2xl:grid-cols-7"
     >
-      {visibleItems.map((dest, index) => (
-        <GuestSpaceCard
-          key={dest.id}
-          dest={dest}
-          renderId={`dest-${dest.id}`}
-          index={index}
-          onSelect={(d, rect, _renderId) => onSelect(d, rect)}
-        />
-      ))}
+      {visibleItems.map((dest, index) => {
+        const renderId = `grid-${category ?? 'all'}-${dest.id}-${index}`;
+
+        return (
+          <GuestSpaceCard
+            key={renderId}
+            dest={dest}
+            renderId={renderId}
+            index={index}
+            onSelect={onSelect}
+          />
+        );
+      })}
     </motion.div>
   );
 };

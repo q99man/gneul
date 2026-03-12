@@ -1,5 +1,5 @@
 .category-slider-section {
-  padding: 2rem 0;
+  padding: 0.25rem 0;
   margin: 0;
   width: 100vw;
   position: relative;
@@ -26,7 +26,7 @@
   overflow: hidden;
   cursor: grab;
   user-select: none;
-  padding: 1.25rem 0;
+  padding: 0.25rem 0;
   touch-action: pan-y pinch-zoom;
 }
 

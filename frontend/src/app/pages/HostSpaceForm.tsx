@@ -506,7 +506,7 @@ const HostSpaceForm: React.FC = () => {
         setActivePreviewId(representative?.clientId ?? firstVisible?.clientId ?? null);
       } catch {
         toast.error("공간 정보를 불러오지 못했습니다.");
-        navigate("/mypage/host/spaces", { replace: true });
+        navigate("/mypage", { replace: true, state: { menu: "host_spaces" } });
       }
     },
     [clearAllNewPreviewUrls, ensureRepresentative, isEdit, navigate]
@@ -633,8 +633,8 @@ const HostSpaceForm: React.FC = () => {
         });
         toast.success("공간이 등록되었습니다.");
       }
-      // 호스트 등록/수정 완료 후에는 항상 호스트 공간 리스트로 복귀
-      navigate("/mypage/host/spaces");
+      // 호스트 등록/수정 완료 후에는 항상 마이페이지의 호스트 공간 리스트 메뉴로 복귀
+      navigate("/mypage", { state: { menu: "host_spaces" } });
     } catch (error) {
       if (error instanceof ApiError) {
         toast.error(error.message || (isEdit ? "공간 수정 실패" : "공간 등록 실패"));
@@ -655,10 +655,10 @@ const HostSpaceForm: React.FC = () => {
   };
 
   const requestClose = (path?: string) => {
-    // 호스트 수정/등록 화면에서의 모든 종료 동선은 항상 리스트로 복귀
-    const target = path ?? "/mypage/host/spaces";
+    // 호스트 수정/등록 화면에서의 모든 종료 동선은 항상 마이페이지의 호스트 공간 리스트 메뉴로 복귀
+    const target = "/mypage";
     setExitTarget(target);
-    setExitMenu(null);
+    setExitMenu("host_spaces");
     setIsExiting(true);
   };
 

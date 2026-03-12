@@ -1,17 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { HostSpaceListContent } from './HostSpaceList';
-import { HostSpaceShell } from './HostSpaceShell';
+import { useEffect } from 'react';
 
 export default function HostSpaces() {
   const navigate = useNavigate();
-  return (
-    <HostSpaceShell onClose={() => navigate('/')}>
-      <div className="px-4 py-6 md:px-6 md:py-8">
-        <div className="mx-auto w-full max-w-7xl">
-          <HostSpaceListContent />
-        </div>
-      </div>
-    </HostSpaceShell>
-  );
+  useEffect(() => {
+    // 호스트 공간 리스트는 항상 마이페이지의 "내 공간 관리" 메뉴 안에서 노출
+    navigate('/mypage', { replace: true, state: { menu: 'host_spaces' } });
+  }, [navigate]);
+
+  return null;
 }

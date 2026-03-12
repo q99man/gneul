@@ -10,7 +10,6 @@ export type GuestSpaceCardDest = {
   description: string;
   price?: string;
   rating?: string;
-  /** 상세 모달용 부가 정보 (선택) */
   address?: string;
   maxCapacity?: number;
 };
@@ -22,12 +21,16 @@ interface GuestSpaceCardProps {
   onSelect: (dest: GuestSpaceCardDest, cardRect: DOMRect, renderId: string) => void;
 }
 
-export function GuestSpaceCard({ dest, renderId, index = 0, onSelect }: GuestSpaceCardProps) {
+export function GuestSpaceCard({
+  dest,
+  renderId,
+  index = 0,
+  onSelect,
+}: GuestSpaceCardProps) {
   return (
     <motion.div
-      data-dest-id={dest.id}
       data-render-id={renderId}
-      className="group flex flex-col w-full cursor-pointer rounded-lg shadow-lg shadow-gray-300/40 ring-1 ring-black/5 overflow-hidden bg-white"
+      className="group/card flex w-full cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-lg shadow-gray-300/40 ring-1 ring-black/5"
       onClick={(e) => onSelect(dest, e.currentTarget.getBoundingClientRect(), renderId)}
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
@@ -41,35 +44,35 @@ export function GuestSpaceCard({ dest, renderId, index = 0, onSelect }: GuestSpa
           alt={dest.title}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-105"
         />
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <span className="text-white text-sm font-medium">자세히 보기</span>
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100">
+          <span className="text-sm font-medium text-white">자세히 보기</span>
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 p-3 md:p-4 text-left min-h-0">
-        <div className="flex items-center justify-between gap-2 min-w-0">
-          <h3 className="text-base md:text-lg font-semibold text-gray-900 truncate font-sans flex-shrink min-w-0">
+      <div className="flex min-h-0 flex-col gap-2 p-3 text-left md:p-4">
+        <div className="flex min-w-0 items-center justify-between gap-2">
+          <h3 className="min-w-0 flex-shrink truncate font-sans text-base font-semibold text-gray-900 md:text-lg">
             {dest.title}
             {dest.subtitle ? `: ${dest.subtitle}` : ''}
           </h3>
 
-          <span className="text-sm md:text-base text-gray-400 font-medium flex-shrink-0">
+          <span className="flex-shrink-0 text-sm font-medium text-gray-400 md:text-base">
             {dest.category}
           </span>
         </div>
 
-        <p className="text-sm md:text-base text-gray-600 truncate leading-snug">
+        <p className="truncate text-sm leading-snug text-gray-600 md:text-base">
           {dest.description}
         </p>
 
-        <div className="flex items-center justify-between gap-2 mt-0.5">
-          <p className="text-base md:text-lg font-bold text-gray-900">
+        <div className="mt-0.5 flex items-center justify-between gap-2">
+          <p className="text-base font-bold text-gray-900 md:text-lg">
             {dest.price ?? '가격 문의'}
           </p>
 
-          <span className="text-sm md:text-base text-gray-400 tabular-nums">
+          <span className="tabular-nums text-sm text-gray-400 md:text-base">
             {dest.rating ? `★ ${dest.rating}` : '\u00A0'}
           </span>
         </div>

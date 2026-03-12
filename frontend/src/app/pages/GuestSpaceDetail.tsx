@@ -13,12 +13,19 @@ type ExitRect = { left: number; top: number; width: number; height: number };
 
 type ModalProps = {
   selectedDest: GuestSpaceCardDest | null;
+  selectedRenderId: string | null;
   cardRect: DOMRect | null;
   exitRect: ExitRect | null;
   onClose: () => void;
 };
 
-export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: ModalProps) {
+export function GuestSpaceDetail({
+  selectedDest,
+  selectedRenderId,
+  cardRect,
+  exitRect,
+  onClose,
+}: ModalProps) {
   const [space, setSpace] = useState<SpaceFormDto | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -36,8 +43,10 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
 
   useEffect(() => {
     if (!spaceId) return;
+
     let cancelled = false;
     setLoading(true);
+
     getSpaceDetail(spaceId)
       .then((data) => {
         if (cancelled) return;
@@ -45,14 +54,18 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
       })
       .catch((error) => {
         if (cancelled) return;
-        if (error instanceof ApiError) toast.error(error.message || '공간 정보를 불러오지 못했습니다.');
-        else toast.error('공간 정보를 불러오지 못했습니다.');
+        if (error instanceof ApiError) {
+          toast.error(error.message || '공간 정보를 불러오지 못했습니다.');
+        } else {
+          toast.error('공간 정보를 불러오지 못했습니다.');
+        }
         onClose();
       })
       .finally(() => {
         if (cancelled) return;
         setLoading(false);
       });
+
     return () => {
       cancelled = true;
     };
@@ -62,6 +75,7 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
     if (!selectedDest) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+
     return () => {
       document.body.style.overflow = prev;
     };
@@ -69,9 +83,11 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
 
   useEffect(() => {
     if (!selectedDest) return;
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
+
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [selectedDest, onClose]);
@@ -84,7 +100,12 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
           width: cardRect.width,
           height: cardRect.height,
         }
-      : { top: 80, left: '50%', width: 'min(1100px, calc(100vw - 32px))', height: 'min(92vh, calc(100vh - 80px))' };
+      : {
+          top: 80,
+          left: '50%',
+          width: 'min(1100px, calc(100vw - 32px))',
+          height: 'min(92vh, calc(100vh - 80px))',
+        };
 
   const exitStyle =
     exitRect != null
@@ -100,6 +121,7 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
     <AnimatePresence>
       {selectedDest && (
         <motion.div
+          key={selectedRenderId ?? selectedDest.id}
           className="fixed inset-0 z-[80]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -117,7 +139,7 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
 
           <motion.div
             className="absolute overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10"
-            style={initialStyle as any}
+            style={initialStyle as React.CSSProperties}
             initial={{
               borderRadius: 18,
               opacity: 1,
@@ -131,7 +153,7 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
               borderRadius: 18,
             }}
             exit={{
-              ...(exitStyle as any),
+              ...(exitStyle as object),
               borderRadius: 18,
               transition: { duration: 0.25, ease: 'easeOut' },
             }}
@@ -139,9 +161,14 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
           >
             <div className="flex items-center justify-between border-b px-4 py-3">
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-gray-900">{selectedDest.title}</p>
-                <p className="truncate text-xs text-gray-500">{selectedDest.category}</p>
+                <p className="truncate text-sm font-medium text-gray-900">
+                  {selectedDest.title}
+                </p>
+                <p className="truncate text-xs text-gray-500">
+                  {selectedDest.category}
+                </p>
               </div>
+
               <Button variant="ghost" onClick={onClose}>
                 닫기
               </Button>
@@ -150,14 +177,20 @@ export function GuestSpaceDetail({ selectedDest, cardRect, exitRect, onClose }: 
             <div className="h-[calc(100%-52px)] overflow-auto">
               {loading && (
                 <div className="flex min-h-[40vh] items-center justify-center">
-                  <p className="text-sm text-gray-500">공간 정보를 불러오는 중입니다...</p>
+                  <p className="text-sm text-gray-500">
+                    공간 정보를 불러오는 중입니다...
+                  </p>
                 </div>
               )}
+
               {!loading && !space && (
                 <div className="flex min-h-[40vh] items-center justify-center">
-                  <p className="text-sm text-gray-500">공간 정보를 찾을 수 없습니다.</p>
+                  <p className="text-sm text-gray-500">
+                    공간 정보를 찾을 수 없습니다.
+                  </p>
                 </div>
               )}
+
               {space && <SpaceDetail space={space} embedded />}
             </div>
           </motion.div>
@@ -184,6 +217,7 @@ export default function GuestSpaceDetailRoute() {
     }
 
     setLoading(true);
+
     getSpaceDetail(id)
       .then((data) => setSpace(data))
       .catch((error) => {

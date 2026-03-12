@@ -158,11 +158,9 @@ export function CategorySlider({ onSelect }: CategorySliderProps) {
           onPointerLeave={resetPointerState}
           onPointerCancel={resetPointerState}
         >
-          <div
-            className="category-slider-container"
-          >
+          <div className="category-slider-container">
             {categories.map((cat, i) => (
-              <div key={cat.name} className="category-slider-slide">
+              <div key={`${cat.name}-${i}`} className="category-slider-slide">
                 <CategorySliderCard
                   cat={cat}
                   index={i}

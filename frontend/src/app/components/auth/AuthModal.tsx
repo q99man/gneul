@@ -24,6 +24,13 @@ export function AuthModal() {
     mass: 0.85,
   };
 
+  const formTransition = {
+    type: 'spring' as const,
+    stiffness: 320,
+    damping: 30,
+    mass: 0.9,
+  };
+
   return createPortal(
     <AnimatePresence>
       {isOpen && (
@@ -82,20 +89,30 @@ export function AuthModal() {
               {mode === 'login' ? '로그인' : '회원가입'}
             </div>
             <div className="pt-2">
-              {mode === 'login' ? (
-                <LoginForm
-                  embedded
-                  successMessage={signupJustCompleted ? '회원가입이 완료되었습니다. 로그인해 주세요.' : undefined}
-                  onSuccess={() => { clearSignupJustCompleted(); closeAuthModal(); }}
-                  onSwitchToSignup={() => setMode('signup')}
-                />
-              ) : (
-                <SignupForm
-                  embedded
-                  onSuccess={() => setMode('login', { signupJustCompleted: true })}
-                  onSwitchToLogin={() => setMode('login')}
-                />
-              )}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={mode}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -14 }}
+                  transition={formTransition}
+                >
+                  {mode === 'login' ? (
+                    <LoginForm
+                      embedded
+                      successMessage={signupJustCompleted ? '회원가입이 완료되었습니다. 로그인해 주세요.' : undefined}
+                      onSuccess={() => { clearSignupJustCompleted(); closeAuthModal(); }}
+                      onSwitchToSignup={() => setMode('signup')}
+                    />
+                  ) : (
+                    <SignupForm
+                      embedded
+                      onSuccess={() => setMode('login', { signupJustCompleted: true })}
+                      onSwitchToLogin={() => setMode('login')}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </motion.div>
         </>
