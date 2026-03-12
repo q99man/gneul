@@ -317,9 +317,9 @@ export function AppSidebar({ onClose, isInline = false, closeOnly = false }: App
         <button
           type="button"
           className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gray-700 hover:bg-gray-900 text-white text-[13px] font-semibold py-3 cursor-pointer shadow-2xl"
-          onClick={() => go('/space/new')}
+          onClick={() => {}}
         >
-          호스트센터
+          호스트 신청
         </button>
       </div>
     </>

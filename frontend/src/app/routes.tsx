@@ -13,6 +13,8 @@ import ReservationList from "./pages/ReservationList";
 import Wishlist from "./pages/Wishlist";
 import HostSpaceForm from "./pages/HostSpaceForm";
 import HostSpaces from "./pages/HostSpaces";
+import HostSpaceDetail from "./pages/HostSpaceDetail";
+import GuestSpaceDetailRoute from "./pages/GuestSpaceDetail";
 
 export const router = createBrowserRouter([
   {
@@ -22,17 +24,20 @@ export const router = createBrowserRouter([
       { path: "/login", Component: Login },
       { path: "/signup", Component: Signup },
       { path: "/oauth/callback", Component: OAuthCallback },
+      { path: "/spaces/:spaceId", Component: GuestSpaceDetailRoute },
       { path: "/order", Component: Order },
       { path: "/reservation/success/:id", Component: ReservationSuccess },
       { path: "/mypage", Component: MyPage },
       { path: "/mypage/edit", Component: MemberEdit },
       { path: "/mypage/reservations", Component: ReservationList },
       { path: "/mypage/wishlist", Component: Wishlist },
+
       { path: "/mypage/host/spaces", Component: HostSpaces },
+      { path: "/mypage/host/spaces/new", Component: HostSpaceForm },
+      { path: "/mypage/host/spaces/:spaceId", Component: HostSpaceDetail },
+      { path: "/mypage/host/spaces/:spaceId/edit", Component: HostSpaceForm },
+
       { path: "/admin", Component: AdminDashboard },
-      { path: "/host/new", Component: HostSpaceForm },
-      { path: "/space/new", Component: HostSpaceForm },
-      { path: "/space/:spaceId/edit", Component: HostSpaceForm },
     ],
   },
 ]);

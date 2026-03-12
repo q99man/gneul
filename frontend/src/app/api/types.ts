@@ -18,14 +18,45 @@ export type SpaceImgDto = {
   oriImgName: string;
   imgUrl: string;
   repImgYn: string;
+  sortOrder?: number;
 };
 
-export type SpaceFormDto = {
-  id?: number | null;
+export type HostSpaceDetailDto = {
+  id: number;
   spaceName: string;
+  category: SpaceCategory;
   price: number;
   spaceDetail: string;
   spaceStatus: SpaceStatus;
+  address: string;
+  detailAddress?: string;
+  maxCapacity: number;
+  contactPhone: string;
+  openTime: string;
+  closeTime: string;
+  notice?: string;
+  refundPolicy?: string;
+  parkingAvailable: boolean;
+  wifiAvailable: boolean;
+  spaceImgDtoList: SpaceImgDto[];
+};
+
+export type SpaceImageMetaDto = {
+  clientId: string;
+  imageId?: number | null;
+  isNew: boolean;
+  deleted: boolean;
+  representative: boolean;
+  sortOrder: number;
+  originalFileName?: string;
+};
+
+export type SpaceFormDto = {
+  id: number | null;
+  spaceName: string;
+  price: number;
+  spaceDetail: string;
+  spaceStatus: 'AVAILABLE' | 'UNAVAILABLE';
   category: SpaceCategory;
   address: string;
   detailAddress?: string;
@@ -37,8 +68,8 @@ export type SpaceFormDto = {
   refundPolicy?: string;
   parkingAvailable: boolean;
   wifiAvailable: boolean;
+  spaceImgIds: number[];
   spaceImgDtoList?: SpaceImgDto[];
-  spaceImgIds?: number[];
 };
 
 export type MainSpaceDto = {
@@ -47,17 +78,22 @@ export type MainSpaceDto = {
   spaceDetail: string;
   imgUrl: string;
   price: number;
-  category: SpaceCategory; // 추가
-  address: string;         // 추가
-  maxCapacity: number;     // 추가
+  category: SpaceCategory;
+  address: string;
+  maxCapacity: number;
 };
 
 export type SpaceDto = {
   id: number;
   spaceName: string;
   price: number;
-  /** 호스트 센터 목록 썸네일용 이미지 URL (없을 수 있음) */
   imgUrl?: string;
+  spaceStatus: SpaceStatus;
+  category?: SpaceCategory;
+  address?: string;
+  maxCapacity?: number;
+  parkingAvailable?: boolean;
+  wifiAvailable?: boolean;
   hostName?: string;
 };
 
@@ -68,14 +104,13 @@ export type CartItemDto = {
 
 export type ReservationDto = {
   spaceId: number;
-  checkInTime: string;  // 변경: ISO String 형식 기대
-  checkOutTime: string; // 변경
-  occupants: number;    // 변경: count 대신 occupants
+  checkInTime: string;
+  checkOutTime: string;
 };
 
 export type ReservationItemDto = {
   spaceName: string;
-  count: number; // occupants와 매핑됨
+  count: number;
   reservationPrice: number;
   imgUrl: string;
   checkInTime: string;
@@ -96,10 +131,9 @@ export type ReservationHistDto = {
   reservationDate: string;
   reservationStatus: ReservationStatus;
   reservationItemDtoList: ReservationItemDto[];
-  totalPrice: number; // 추가
+  totalPrice: number;
 };
 
-/** 주문서 폼 GET 응답 (ReservationService 기반으로 재정의 필요할 수 있음) */
 export type OrderFormDto = {
   name: string;
   email: string;
@@ -115,29 +149,24 @@ export type OrderFormDto = {
   totalPrice: number;
 };
 
-/** 예약 확정 POST 요청 */
 export type ReservationConfirmDto = {
   phoneNumber: string;
   address: string;
   orderDtoList: Array<{ spaceId: number; count: number }>;
 };
 
-/** 예약 확인(성공) 페이지 GET 응답 */
 export type ReservationSuccessDto = {
   reservationId: number;
   spaceName: string;
   totalPrice: number;
-  reservationDate: string; // 추가
+  reservationDate: string;
 };
 
-/** 마이페이지 GET 응답 */
 export type MypageDto = {
   name: string;
   email: string;
   phoneNumber?: string;
   address?: string;
-  /** 사용자 권한 */
-  role?: 'USER' | 'ADMIN' | 'HOST' | 'GUEST'; // GUEST 추가
-  /** 백엔드에서 없을 수 있음 */
+  role?: 'USER' | 'ADMIN' | 'HOST' | 'GUEST';
   recentReservations?: Array<ReservationHistDto>;
 };

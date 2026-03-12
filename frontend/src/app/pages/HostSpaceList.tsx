@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
-import { getMySpaces } from '../api/space';
+import { getMySpaces, deleteHostSpace, toggleSpaceStatus } from '../api/space';
 import type { SpaceDto } from '../api/types';
 import { ApiError } from '../api/ApiError';
+import { toast } from 'sonner';
 
 type HostSpaceListContentProps = {
   embedded?: boolean;
@@ -14,40 +16,47 @@ type HostSpaceRouteFrom = 'mypage-host-spaces' | 'host-spaces-page';
 
 export const HostSpaceListContent: React.FC<HostSpaceListContentProps> = ({ embedded = false }) => {
   const navigate = useNavigate();
+
   const [spaces, setSpaces] = useState<SpaceDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [togglingId, setTogglingId] = useState<number | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<{ id: number; name: string; rect: DOMRect } | null>(null);
 
   const routeFrom: HostSpaceRouteFrom = useMemo(
     () => (embedded ? 'mypage-host-spaces' : 'host-spaces-page'),
     [embedded]
   );
 
-  const loadSpaces = useCallback(async (signal?: { cancelled: boolean }) => {
-    try {
-      setLoading(true);
-      setError('');
+  const loadSpaces = useCallback(
+    async (signal?: { cancelled: boolean }) => {
+      try {
+        setLoading(true);
+        setError('');
 
-      const data = await getMySpaces();
-      if (signal?.cancelled) return;
+        const data = await getMySpaces();
+        if (signal?.cancelled) return;
 
-      setSpaces(Array.isArray(data) ? data : []);
-    } catch (error) {
-      if (signal?.cancelled) return;
+        setSpaces(Array.isArray(data) ? data : []);
+      } catch (error) {
+        if (signal?.cancelled) return;
 
-      if (error instanceof ApiError && error.status === 401) {
-        navigate('/login', { replace: true });
-        return;
+        if (error instanceof ApiError && error.status === 401) {
+          navigate('/login', { replace: true });
+          return;
+        }
+
+        setError(error instanceof Error ? error.message : '공간 목록을 불러오지 못했습니다.');
+        setSpaces([]);
+      } finally {
+        if (!signal?.cancelled) {
+          setLoading(false);
+        }
       }
-
-      setError(error instanceof Error ? error.message : '공간 목록을 불러오지 못했습니다.');
-      setSpaces([]);
-    } finally {
-      if (!signal?.cancelled) {
-        setLoading(false);
-      }
-    }
-  }, [navigate]);
+    },
+    [navigate]
+  );
 
   useEffect(() => {
     const signal = { cancelled: false };
@@ -59,18 +68,91 @@ export const HostSpaceListContent: React.FC<HostSpaceListContentProps> = ({ embe
   }, [loadSpaces]);
 
   const handleCreate = useCallback(() => {
-    navigate('/space/new', {
+    navigate('/mypage/host/spaces/new', {
       state: { from: routeFrom },
     });
   }, [navigate, routeFrom]);
 
-  const handleEdit = useCallback(
+  const handleDetail = useCallback(
     (id: number) => {
-      navigate(`/space/${id}/edit`, {
+      navigate(`/mypage/host/spaces/${id}`, {
         state: { from: routeFrom },
       });
     },
     [navigate, routeFrom]
+  );
+
+  const handleEdit = useCallback(
+    (id: number) => {
+      navigate(`/mypage/host/spaces/${id}/edit`, {
+        state: { from: routeFrom },
+      });
+    },
+    [navigate, routeFrom]
+  );
+
+  const handleDeleteClick = useCallback(
+    (id: number, name: string, button: HTMLButtonElement | null) => {
+      if (deletingId === id) return;
+      if (!button) return;
+      setConfirmTarget({ id, name, rect: button.getBoundingClientRect() });
+    },
+    [deletingId]
+  );
+
+  const handleDeleteConfirmed = useCallback(
+    async (id: number) => {
+      setConfirmTarget(null);
+
+      try {
+        setDeletingId(id);
+        await deleteHostSpace(id);
+        toast.success('공간이 삭제되었습니다.');
+        setSpaces((prev) => prev.filter((space) => space.id !== id));
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 401) {
+          navigate('/login', { replace: true });
+          return;
+        }
+
+        toast.error(err instanceof Error ? err.message : '공간 삭제 중 오류가 발생했습니다.');
+      } finally {
+        setDeletingId(null);
+      }
+    },
+    [navigate]
+  );
+
+  const handleToggleStatus = useCallback(
+    async (id: number) => {
+      try {
+        setTogglingId(id);
+        const updatedStatus = await toggleSpaceStatus(id);
+
+        setSpaces((prev) =>
+          prev.map((space) =>
+            space.id === id
+              ? {
+                ...space,
+                spaceStatus: updatedStatus,
+              }
+              : space
+          )
+        );
+
+        toast.success('공간 상태가 변경되었습니다.');
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          navigate('/login', { replace: true });
+          return;
+        }
+
+        toast.error(error instanceof Error ? error.message : '상태 변경 실패');
+      } finally {
+        setTogglingId(null);
+      }
+    },
+    [navigate]
   );
 
   const content = (
@@ -109,13 +191,20 @@ export const HostSpaceListContent: React.FC<HostSpaceListContentProps> = ({ embe
           {spaces.map((space) => {
             const safePrice = Number(space.price ?? 0);
             const safeName = space.spaceName?.trim() || '이름 없는 공간';
+            const isDeleting = deletingId === space.id;
+            const isToggling = togglingId === space.id;
+            const isBusy = isDeleting || isToggling;
 
             return (
               <Card
                 key={space.id}
                 className="overflow-hidden border border-gray-200/80 p-0 shadow-sm"
               >
-                <div className="flex h-32 border-b border-gray-200 bg-gray-50">
+                <button
+                  type="button"
+                  onClick={() => handleDetail(space.id)}
+                  className="flex h-32 w-full border-b border-gray-200 bg-gray-50 text-left"
+                >
                   <div className="h-full w-32 flex-shrink-0 overflow-hidden bg-gray-200">
                     {space.imgUrl ? (
                       <img
@@ -140,18 +229,71 @@ export const HostSpaceListContent: React.FC<HostSpaceListContentProps> = ({ embe
                       <p className="mt-1 text-sm text-gray-500">
                         {safePrice.toLocaleString()}원
                       </p>
+                      <p className="mt-1 text-xs">
+                        <span
+                          className={
+                            space.spaceStatus === 'AVAILABLE'
+                              ? 'font-medium text-green-600'
+                              : 'font-medium text-gray-500'
+                          }
+                        >
+                          {space.spaceStatus === 'AVAILABLE' ? '이용 가능' : '이용 불가'}
+                        </span>
+                      </p>
                     </div>
                   </div>
-                </div>
+                </button>
 
-                <div className="flex justify-end bg-gray-50 p-2">
+                <div className="grid grid-cols-3 gap-2 border-t border-gray-200/80 bg-gray-50 p-2">
                   <Button
-                    variant="ghost"
+                    type="button"
+                    variant="outline"
                     size="sm"
-                    className="text-[13px]"
-                    onClick={() => handleEdit(space.id)}
+                    className="w-full text-[13px]"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleEdit(space.id);
+                    }}
+                    disabled={isBusy}
                   >
                     수정하기
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-red-200 text-[13px] text-red-600 hover:bg-red-50 hover:text-red-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDeleteClick(space.id, safeName, e.currentTarget);
+                    }}
+                    disabled={isBusy}
+                  >
+                    {isDeleting ? '삭제 중...' : '삭제하기'}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    size="sm"
+                    className={`w-full text-[13px] ${space.spaceStatus === 'AVAILABLE'
+                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      void handleToggleStatus(space.id);
+                    }}
+                    disabled={isBusy}
+                  >
+                    {isToggling
+                      ? '변경 중...'
+                      : space.spaceStatus === 'AVAILABLE'
+                        ? '이용중'
+                        : '이용중지'}
                   </Button>
                 </div>
               </Card>
@@ -159,6 +301,61 @@ export const HostSpaceListContent: React.FC<HostSpaceListContentProps> = ({ embe
           })}
         </div>
       )}
+
+      {typeof document !== 'undefined' &&
+        confirmTarget &&
+        createPortal(
+          <>
+            <div
+              className="fixed inset-0 z-[95]"
+              aria-hidden
+              onClick={() => setConfirmTarget(null)}
+            />
+            <div
+              className="fixed z-[96] min-w-[200px] rounded-xl border border-gray-200 bg-white p-3 shadow-lg"
+              style={{
+                top: confirmTarget.rect.top,
+                left: (() => {
+                  const viewW = window.innerWidth;
+                  const approximateWidth = 240;
+                  const center =
+                    confirmTarget.rect.left +
+                    confirmTarget.rect.width / 2 -
+                    approximateWidth / 2;
+                  const padding = 12;
+                  const maxLeft = viewW - approximateWidth - padding;
+                  return Math.max(padding, Math.min(center, maxLeft));
+                })(),
+                transform: 'translateY(-100%)',
+                maxWidth: window.innerWidth - 32,
+              }}
+            >
+              <p className="mb-3 text-center text-[13px] font-medium text-gray-800">
+                &quot;{confirmTarget.name}&quot; 공간을 삭제하시겠습니까?
+                <br />
+                <span className="text-gray-500">삭제 후 복구할 수 없습니다.</span>
+              </p>
+
+              <div className="flex justify-center gap-2">
+                <button
+                  type="button"
+                  className="cursor-pointer rounded-lg bg-black px-4 py-2 text-[13px] font-medium text-white hover:bg-gray-800"
+                  onClick={() => handleDeleteConfirmed(confirmTarget.id)}
+                >
+                  확인
+                </button>
+                <button
+                  type="button"
+                  className="cursor-pointer rounded-lg border border-gray-200 bg-white px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={() => setConfirmTarget(null)}
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          </>,
+          document.body
+        )}
     </div>
   );
 

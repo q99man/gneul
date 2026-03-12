@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SpaceImgRepository extends JpaRepository<SpaceImg, Long> {
-    List<SpaceImg> findBySpaceIdOrderByIdAsc(Long spaceId);
+    List<SpaceImg> findBySpaceIdOrderBySortOrderAscIdAsc(Long spaceId);
+
+    List<SpaceImg> findBySpaceIdOrderBySortOrderAsc(Long spaceId);
 
     // SpaceId는 Space 엔티티의 id 필드를 찾아가며, repimgYn은 대표 이미지 여부를 확인합니다.
     Optional<SpaceImg> findBySpaceIdAndRepimgYn(Long spaceId, String repimgYn);

@@ -141,13 +141,15 @@ export function MemberEditContent({
               className="w-full px-3 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-[14px] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
             />
           </div>
-          <button
-            type="submit"
-            disabled={submitting || success}
-            className="w-full py-3 rounded-lg bg-gray-900 text-white text-[14px] font-medium hover:bg-gray-800 disabled:opacity-60 disabled:pointer-events-none transition-colors"
-          >
-            {submitting ? '처리 중...' : success ? '완료' : '수정 완료'}
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={submitting || success}
+              className="w-1/3 min-w-[120px] py-3 rounded-lg bg-gray-900 text-white text-[14px] font-medium hover:bg-gray-800 disabled:opacity-60 disabled:pointer-events-none transition-colors"
+            >
+              {submitting ? '처리 중...' : success ? '완료' : '수정 완료'}
+            </button>
+          </div>
         </form>
         {!embedded && (
           <button

@@ -2,21 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Layout } from '../components/ui/Layout';
-import { DestinationGrid } from '../components/destination/DestinationGrid';
-import { DestinationDetail } from '../components/destination/DestinationDetail';
-import { CategorySlider } from '../components/destination/CategorySlider';
+import { GuestSpaceGrid } from './GuestSpaceGrid';
+import { GuestSpaceDetail } from './GuestSpaceDetail';
+import { CategorySlider } from '../components/category/CategorySlider';
 import { CATEGORIES } from '../data/categories';
-import { PlaceSection } from '../components/destination/PlaceSection';
-import type { DestinationCardDest } from '../components/destination/DestinationCard';
+import { PlaceSection } from './PlaceSection';
+import type { GuestSpaceCardDest } from './GuestSpaceCard';
 import { getMainSpaces } from '../api/space';
 import type { MainSpaceDto } from '../api/types';
 
 type ExitRect = { left: number; top: number; width: number; height: number };
 
 interface HomeContentProps {
-  destinations: DestinationCardDest[];
-  selectedDest: DestinationCardDest | null;
-  setSelectedDest: React.Dispatch<React.SetStateAction<DestinationCardDest | null>>;
+  destinations: GuestSpaceCardDest[];
+  selectedDest: GuestSpaceCardDest | null;
+  setSelectedDest: React.Dispatch<React.SetStateAction<GuestSpaceCardDest | null>>;
   cardRect: DOMRect | null;
   setCardRect: React.Dispatch<React.SetStateAction<DOMRect | null>>;
   exitRect: ExitRect | null;
@@ -157,13 +157,13 @@ const HomeContent = ({
 
           {selectedCategory && (
             <motion.div
-              key="destination-grid"
+              key="guest-space-grid"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
             >
-              <DestinationGrid
+              <GuestSpaceGrid
                 items={destinations}
                 category={selectedCategory}
                 onSelect={(dest, rect) => {
@@ -177,20 +177,21 @@ const HomeContent = ({
         </AnimatePresence>
       </div>
 
-      <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center">
+      <div className="fixed bottom-32 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center">
         <button
           type="button"
-          className="bg-black text-white px-8 py-4 rounded-full flex items-center gap-3 hover:bg-gray-700 transition-colors shadow-2xl cursor-pointer"
+          className="group flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-black text-white shadow-2xl transition-all duration-300 ease-out hover:w-44 hover:bg-gray-800 cursor-pointer px-0 hover:px-5 gap-0 hover:gap-2"
           onClick={handleScrollTop}
+          aria-label="Back to top"
         >
-          <span className="uppercase text-sm font-bold tracking-widest font-sans">
-            Back to Top
+          <ArrowUp size={18} className="shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5" />
+          <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm font-bold tracking-widest font-sans opacity-0 transition-all duration-300 group-hover:max-w-40 group-hover:opacity-100">
+            Back to top
           </span>
-          <ArrowUp size={18} className="transition-transform duration-500" />
         </button>
       </div>
 
-      <DestinationDetail
+      <GuestSpaceDetail
         selectedDest={selectedDest}
         cardRect={cardRect}
         exitRect={exitRect}
@@ -201,8 +202,8 @@ const HomeContent = ({
 };
 
 export default function Home() {
-  const [destinations, setDestinations] = useState<DestinationCardDest[]>([]);
-  const [selectedDest, setSelectedDest] = useState<DestinationCardDest | null>(null);
+  const [destinations, setDestinations] = useState<GuestSpaceCardDest[]>([]);
+  const [selectedDest, setSelectedDest] = useState<GuestSpaceCardDest | null>(null);
   const [cardRect, setCardRect] = useState<DOMRect | null>(null);
   const [exitRect, setExitRect] = useState<ExitRect | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -220,7 +221,7 @@ export default function Home() {
 
         const categoryNames = CATEGORIES.filter((c) => c.name !== '전체').map((c) => c.name);
 
-        const mapped: DestinationCardDest[] = list.map((s, i) => {
+        const mapped: GuestSpaceCardDest[] = list.map((s, i) => {
           const categoryLabel =
             categoryNames.length > 0
               ? categoryNames[i % categoryNames.length]

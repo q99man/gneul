@@ -13,6 +13,9 @@ public class SpaceImg extends BaseTimeEntity {
     @Column(name = "space_img_id")
     private Long id;
 
+    @Column(name = "sort_order", nullable = false)
+    private Integer sortOrder = 0;
+
     private String imgName; // 고유 파일명
     private String oriImgName; // 원본 파일명
     private String imgUrl; // 이미지 조회 경로
@@ -29,5 +32,10 @@ public class SpaceImg extends BaseTimeEntity {
         this.oriImgName = oriImgName;
         this.imgName = imgName;
         this.imgUrl = imgUrl;
+    }
+
+    public void updateMeta(boolean representative, int sortOrder) {
+        this.repimgYn = representative ? "Y" : "N";
+        this.sortOrder = sortOrder;
     }
 }

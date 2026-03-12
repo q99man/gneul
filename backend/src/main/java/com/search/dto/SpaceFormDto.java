@@ -67,6 +67,7 @@ public class SpaceFormDto {
     private List<SpaceImgDto> spaceImgDtoList = new ArrayList<>();
     private List<Long> spaceImgIds = new ArrayList<>();
 
+
     public static SpaceFormDto of(Space space) {
         SpaceFormDto dto = new SpaceFormDto();
         dto.setId(space.getId());

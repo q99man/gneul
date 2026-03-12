@@ -13,6 +13,7 @@ import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
+import { getToken } from "../utils/auth";
 
 type MemberItem = {
   id: number;
@@ -40,13 +41,17 @@ export const AdminDashboardContent: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/admin/${currentTab}`);
+      const token = getToken();
+      const headers: Record<string, string> = { Accept: "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(`/api/admin/${currentTab}`, { headers });
       if (!res.ok) {
         throw new Error("failed");
       }
       const data = await res.json();
       setItems(data || []);
     } catch (error) {
+      setItems([]);
       toast(
         "데이터 로드 실패",
         {
@@ -65,9 +70,12 @@ export const AdminDashboardContent: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!window.confirm("정말로 삭제하시겠습니까?")) return;
     try {
+      const token = getToken();
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
       const res = await fetch(
         `/api/admin/${currentTab === "members" ? "member" : "space"}/${id}`,
-        { method: "DELETE" },
+        { method: "DELETE", headers },
       );
       if (!res.ok) {
         throw new Error("failed");

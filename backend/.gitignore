@@ -34,9 +34,5 @@ backend/src/main/resources/application-secret.yaml
 /nbdist/
 /.nb-gradle/
 
-.env
-.env.*
-*.log
-/target/
-/.idea/
-/.vscode/
+### VS Code ###
+.vscode/

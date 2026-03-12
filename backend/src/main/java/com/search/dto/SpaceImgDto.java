@@ -12,6 +12,7 @@ public class SpaceImgDto {
     private String oriImgName;
     private String imgUrl;
     private String repImgYn;
+    private Integer sortOrder;
 
     // Entity -> DTO 변환 (ModelMapper를 써도 되지만, 수동 메서드 방식입니다)
     public static SpaceImgDto of(SpaceImg spaceImg) {
@@ -21,6 +22,7 @@ public class SpaceImgDto {
         spaceImgDto.setOriImgName(spaceImg.getOriImgName());
         spaceImgDto.setImgUrl(spaceImg.getImgUrl());
         spaceImgDto.setRepImgYn(spaceImg.getRepimgYn());
+        spaceImgDto.setSortOrder(spaceImg.getSortOrder());
         return spaceImgDto;
     }
 }

@@ -10,6 +10,7 @@ import { MemberEditContent } from './MemberEdit';
 import { WishlistContent } from './Wishlist';
 import { AdminDashboardContent } from './AdminDashboard';
 import { HostSpaceListContent } from './HostSpaceList';
+import { PointsCouponsContent } from './PointsCoupons';
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -27,10 +28,10 @@ function useIsMobile() {
   return isMobile;
 }
 
-type MypageMenuId = 'profile' | 'edit' | 'reservations' | 'wishlist' | 'admin' | 'host_spaces';
+type MypageMenuId = 'reward' | 'edit' | 'reservations' | 'wishlist' | 'admin' | 'host_spaces';
 
 const MENU_ITEMS: { id: MypageMenuId; label: string }[] = [
-  { id: 'profile', label: '프로필' },
+  { id: 'reward', label: '포인트 & 쿠폰' },
   { id: 'edit', label: '개인정보 수정' },
   { id: 'reservations', label: '내 예약 내역' },
   { id: 'wishlist', label: '관심상품' },
@@ -172,30 +173,17 @@ function MypageDetailPanel({
   onNavigate: (path: string) => void;
   onSelectMenu: (id: MypageMenuId) => void;
 }) {
-  if (menuId === 'profile') {
+  if (menuId === 'reward') {
     return (
       <motion.div
-        key="profile"
+        key="reward"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
-        className={detailPanelClass}
+        className={`${detailPanelClass} flex flex-col min-h-0 overflow-hidden`}
       >
-        <div className="max-w-xl">
-          <h2 className="text-[15px] font-semibold text-gray-800 mb-4">프로필</h2>
-          <div className="space-y-2 text-gray-700 text-[13px] font-medium">
-            <p>이름 {data.name}</p>
-            <p>이메일 {data.email}</p>
-            <p>전화번호 {data.phoneNumber ?? '미등록'}</p>
-            <p>주소 {data.address ?? '미등록'}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onSelectMenu('edit')}
-            className="mt-6 w-full inline-flex items-center justify-center py-2.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-[13px] font-medium cursor-pointer"
-          >
-            정보 수정
-          </button>
+        <div className="w-full max-w-3xl mx-auto flex-1 flex flex-col min-h-0">
+          <PointsCouponsContent embedded />
         </div>
       </motion.div>
     );
@@ -210,8 +198,8 @@ function MypageDetailPanel({
         transition={{ duration: 0.2 }}
         className={detailPanelClass}
       >
-        <div className="max-w-xl">
-          <MemberEditContent embedded onDone={() => onSelectMenu('profile')} />
+        <div className="max-w-xl mx-auto">
+          <MemberEditContent embedded onDone={() => onSelectMenu('reward')} />
         </div>
       </motion.div>
     );
@@ -226,7 +214,7 @@ function MypageDetailPanel({
         transition={{ duration: 0.2 }}
         className={detailPanelClass}
       >
-        <div className="max-w-3xl">
+        <div className="max-w-3xl mx-auto">
           <ReservationListContent embedded />
         </div>
       </motion.div>
@@ -242,7 +230,7 @@ function MypageDetailPanel({
         transition={{ duration: 0.2 }}
         className={detailPanelClass}
       >
-        <div className="max-w-3xl">
+        <div className="max-w-3xl mx-auto">
           <WishlistContent embedded />
         </div>
       </motion.div>
@@ -288,7 +276,7 @@ export default function MyPage() {
   const [data, setData] = useState<MypageDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMenu, setSelectedMenu] = useState<MypageMenuId>('profile');
+  const [selectedMenu, setSelectedMenu] = useState<MypageMenuId>('reward');
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [exitTarget, setExitTarget] = useState('/');

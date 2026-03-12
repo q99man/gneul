@@ -1,8 +1,10 @@
 package com.search.controller;
 
 import com.search.dto.MainSpaceDto;
+import com.search.dto.SpaceFormDto;
 import com.search.dto.SpaceSearchDto;
 import com.search.service.SpaceService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +27,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class MainSpaceController {
 
     private final SpaceService spaceService;
+
+    /** 고객용 공간 상세 조회 (인증 불필요) */
+    @GetMapping("/{spaceId}")
+    public ResponseEntity<SpaceFormDto> getSpaceDetail(@PathVariable("spaceId") Long spaceId) {
+        try {
+            return ResponseEntity.ok(spaceService.getSpaceDetailPublic(spaceId));
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     @GetMapping("/main")
     public ResponseEntity<Page<MainSpaceDto>> getMainSpaces(
