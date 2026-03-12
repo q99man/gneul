@@ -1,1 +1,15 @@
+.idea/
+node_modules/
+backend/.gradle/
+backend/build/
+backend/upload/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+*.log
+.DS_Store
+Thumbs.db
 backend/src/main/resources/application-secret.yaml
